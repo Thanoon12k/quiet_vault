@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Quiet Vault's goofy little lock</title>
+  <rect x="2" y="2" width="124" height="124" rx="27" fill="#eaf0df"/>
+  <path d="M44 55V46a21 27.5 0 0 1 42 0v9" fill="none" stroke="#355a45" stroke-width="13" stroke-linecap="round"/>
+  <rect x="19" y="43" width="90" height="72" rx="23" fill="#355a45"/>
+  <circle cx="43.5" cy="69.5" r="15.5" fill="#fffdf3"/>
+  <circle cx="84" cy="67" r="18" fill="#fffdf3"/>
+  <ellipse cx="45" cy="70" rx="6" ry="7" fill="#233c2c"/>
+  <ellipse cx="78.5" cy="67.5" rx="6.5" ry="7.5" fill="#233c2c"/>
+  <circle cx="44" cy="67" r="2" fill="#fffdf3"/>
+  <circle cx="77" cy="64" r="2" fill="#fffdf3"/>
+  <path d="M47 88Q62 111 83 90" fill="none" stroke="#233c2c" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="71" cy="98" rx="6" ry="6" fill="#eea89e"/>
+  <path d="M71 94v4" stroke="#cf7f78" stroke-width="1.7"/>
+</svg>

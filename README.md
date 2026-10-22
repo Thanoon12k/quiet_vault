@@ -1,6 +1,16 @@
-# Quiet Vault mobile
+# Quiet Vault
 
-Android-first Flutter companion to Quiet Vault for Chrome. Created in `D:\apps\quiet_vault_mobile`.
+Android-first Flutter app and Chrome extension sharing the same encrypted Supabase vault.
+
+## Project layout
+
+- `lib/`, `android/`: Flutter Android app.
+- `chrome_extension/quiet-vault/`: Chrome extension source, tests, icon assets, and build scripts.
+- `chrome_extension/quiet-vault/supabase/`: backend SQL schema and managed-key functions deployed to Supabase.
+
+The backend runs in Supabase. Only the public Supabase URL/key belong in these clients; credentials and service-role keys must stay out of Git.
+
+Build the Chrome extension from `chrome_extension/quiet-vault` using `npm ci` then `npm run build`; load its `dist/` folder in `chrome://extensions`. See that folder's README for details.
 
 ## Use
 

@@ -1,0 +1,37 @@
+# Dependencies and local environments
+node_modules/
+.venv/
+venv/
+env/
+
+# Build output and caches
+dist/
+build/
+coverage/
+.cache/
+__pycache__/
+*.py[cod]
+*.log
+
+# Local secrets and configuration
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+
+# Packaged extensions and local documents
+*.zip
+*.crx
+*.docx
+~$*
+
+# Editors and operating systems
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+Desktop.ini
