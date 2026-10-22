@@ -1,0 +1,269 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sky Colors Air Race</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Barlow:wght@400;600&display=swap">
+<style>
+  /* Layout: one centered cockpit column; canvas is the windscreen, HUD strip above, controls hint below. Single dusk-sky look on purpose. */
+  :root {
+    --night: #0c1424;
+    --panel: #121d33;
+    --line: #2a3b5c;
+    --hud: #9ff3d1;
+    --text: #e6ecf7;
+    --muted: #8a9abb;
+    --warn: #ff6b5a;
+    --f-display: "Chakra Petch", "Arial Narrow", system-ui, sans-serif;
+    --f-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  body {
+    background: var(--night);
+    color: var(--text);
+    font-family: var(--f-body);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 16px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    touch-action: none;
+    overflow: hidden;
+  }
+  .cockpit { width: min(100%, 420px); display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .hud {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+    font-family: var(--f-display); text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .hud div { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; display: flex; flex-direction: column; }
+  .hud small { color: var(--muted); font-size: 10px; }
+  .hud b { color: var(--hud); font-size: 20px; font-variant-numeric: tabular-nums; }
+  .hud .swatch { display: inline-block; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--text); vertical-align: -3px; }
+  .screen { position: relative; flex: 1; min-height: 0; display: flex; justify-content: center; }
+  canvas { display: block; height: 100%; max-height: 640px; max-width: 100%; aspect-ratio: 2 / 3; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+  .over {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    background: rgba(12, 20, 36, 0.82); border-radius: 10px; text-align: center; padding: 16px;
+  }
+  .over h2 { font-family: var(--f-display); font-size: 30px; letter-spacing: 0.06em; margin: 0; text-wrap: balance; }
+  .over p { margin: 0; color: var(--muted); max-width: 30ch; }
+  .over button {
+    font-family: var(--f-display); font-size: 18px; letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--hud); color: var(--night); border: 0; border-radius: 6px; padding: 12px 28px; cursor: pointer;
+  }
+  .over button:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
+  .hint { color: var(--muted); font-size: 13px; text-align: center; margin: 0; }
+  .hint kbd { font-family: var(--f-display); color: var(--text); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+</style>
+
+<div class="cockpit">
+  <div class="hud">
+    <div><small>Score</small><b id="score">0</b></div>
+    <div><small>Planes</small><b id="lives">✈✈✈</b></div>
+    <div><small>Smoke</small><b><span class="swatch" id="swatch"></span></b></div>
+  </div>
+  <div class="screen">
+    <canvas id="game" width="400" height="600" aria-label="Air race game"></canvas>
+    <div class="over" id="over">
+      <h2 id="overTitle">Sky Colors</h2>
+      <p id="overText">Fly through gates that match your smoke color. Wrong color costs a plane.</p>
+      <button id="startBtn" type="button">Take off</button>
+    </div>
+  </div>
+  <p class="hint"><kbd>←</kbd> <kbd>→</kbd> steer · <kbd>Space</kbd> or tap to switch smoke color · drag to steer on touch</p>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const $ = id => document.getElementById(id);
+
+  const COLORS = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8bd4'];
+  const GATE_W = 64, GATE_H = 22;
+  const PLANE_W = 54, PLANE_H = 50;
+
+  let plane, gates, clouds, trail, score, lives, running, speedUp, keys = {};
+
+  function reset() {
+    plane = { x: W / 2, y: H - 80, color: 0, speed: 6, tilt: 0 };
+    gates = []; trail = [];
+    clouds = Array.from({ length: 7 }, () => newCloud(Math.random() * H));
+    score = 0; lives = 3; speedUp = 0;
+    updateHud();
+  }
+
+  function newCloud(y) {
+    const depth = 0.3 + Math.random() * 0.7;
+    return { x: Math.random() * W, y, r: 18 + depth * 30, depth };
+  }
+
+  function newGate() {
+    // Bias toward the plane's current color so matches are common enough to chain.
+    const color = Math.random() < 0.35 ? plane.color : Math.floor(Math.random() * COLORS.length);
+    return { x: GATE_W / 2 + Math.random() * (W - GATE_W), y: -GATE_H, color, speed: 2 + Math.random() + speedUp };
+  }
+
+  function cycleColor() { if (running) { plane.color = (plane.color + 1) % COLORS.length; updateHud(); } }
+
+  function updateHud() {
+    $('score').textContent = score;
+    $('lives').textContent = '✈'.repeat(Math.max(lives, 0)) || '—';
+    $('swatch').style.background = COLORS[plane.color];
+  }
+
+  function drawSky() {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#1b2a52'); g.addColorStop(0.6, '#3d4f8a'); g.addColorStop(1, '#e48a6a');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    for (const c of clouds) {
+      ctx.fillStyle = `rgba(255,255,255,${0.08 + c.depth * 0.18})`;
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+      ctx.arc(c.x + c.r * 0.9, c.y + c.r * 0.2, c.r * 0.7, 0, Math.PI * 2);
+      ctx.arc(c.x - c.r * 0.9, c.y + c.r * 0.25, c.r * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawGate(g) {
+    // Air-race pylon pair with a colored ribbon between them.
+    ctx.fillStyle = '#f2f4f8';
+    ctx.fillRect(g.x - GATE_W / 2 - 6, g.y - 4, 6, GATE_H + 8);
+    ctx.fillRect(g.x + GATE_W / 2, g.y - 4, 6, GATE_H + 8);
+    ctx.fillStyle = COLORS[g.color];
+    ctx.globalAlpha = 0.85;
+    ctx.fillRect(g.x - GATE_W / 2, g.y, GATE_W, GATE_H);
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2;
+    ctx.strokeRect(g.x - GATE_W / 2, g.y, GATE_W, GATE_H);
+  }
+
+  function drawPlane() {
+    // Smoke trail
+    for (let i = 0; i < trail.length; i++) {
+      const t = trail[i];
+      ctx.fillStyle = t.color; ctx.globalAlpha = (i / trail.length) * 0.5;
+      ctx.beginPath(); ctx.arc(t.x, t.y, 3 + (trail.length - i) * 0.25, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    const { x, y } = plane, col = COLORS[plane.color];
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(plane.tilt);
+    ctx.strokeStyle = '#0c1424'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+    // Wings
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    ctx.moveTo(-PLANE_W / 2, 6); ctx.lineTo(0, -6); ctx.lineTo(PLANE_W / 2, 6); ctx.lineTo(0, 2); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    // Tailplane
+    ctx.beginPath();
+    ctx.moveTo(-14, PLANE_H / 2 - 4); ctx.lineTo(0, PLANE_H / 2 - 12); ctx.lineTo(14, PLANE_H / 2 - 4); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    // Fuselage
+    ctx.fillStyle = '#f2f4f8';
+    ctx.beginPath(); ctx.ellipse(0, 0, 6, PLANE_H / 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // Canopy
+    ctx.fillStyle = '#5ab0ff';
+    ctx.beginPath(); ctx.ellipse(0, -10, 3.5, 7, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function hits(g) {
+    return Math.abs(g.x - plane.x) < GATE_W / 2 + PLANE_W / 2 - 10 &&
+           Math.abs(g.y + GATE_H / 2 - plane.y) < GATE_H / 2 + PLANE_H / 2 - 8;
+  }
+
+  function step() {
+    if (!running) return;
+
+    let dx = 0;
+    if (keys.ArrowLeft) dx -= plane.speed;
+    if (keys.ArrowRight) dx += plane.speed;
+    plane.x = Math.max(PLANE_W / 2, Math.min(W - PLANE_W / 2, plane.x + dx));
+    plane.tilt += ((dx / plane.speed) * 0.35 - plane.tilt) * 0.2;
+
+    trail.push({ x: plane.x, y: plane.y + PLANE_H / 2, color: COLORS[plane.color] });
+    for (const t of trail) t.y += 3;
+    if (trail.length > 24) trail.shift();
+
+    for (const c of clouds) {
+      c.y += 1 + c.depth * 2 + speedUp;
+      if (c.y - c.r > H) Object.assign(c, newCloud(-60));
+    }
+
+    if (Math.random() < 0.02 + speedUp * 0.01) gates.push(newGate());
+
+    drawSky();
+
+    for (let i = gates.length - 1; i >= 0; i--) {
+      const g = gates[i];
+      g.y += g.speed;
+      if (hits(g)) {
+        gates.splice(i, 1);
+        if (g.color === plane.color) {
+          score += 10;
+          speedUp = Math.min(3, score / 400);
+        } else if (--lives <= 0) {
+          updateHud(); drawPlane(); return endGame();
+        }
+        updateHud();
+      } else if (g.y > H) {
+        gates.splice(i, 1);
+      } else {
+        drawGate(g);
+      }
+    }
+
+    drawPlane();
+    requestAnimationFrame(step);
+  }
+
+  function start() {
+    reset();
+    $('over').hidden = true;
+    running = true;
+    requestAnimationFrame(step);
+  }
+
+  function endGame() {
+    running = false;
+    $('overTitle').textContent = 'Grounded';
+    $('overText').textContent = `You scored ${score} points.`;
+    $('startBtn').textContent = 'Fly again';
+    $('over').hidden = false;
+    $('startBtn').focus();
+  }
+
+  document.addEventListener('keydown', e => {
+    if (['ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
+    keys[e.key] = true;
+    if (e.key === ' ' && !e.repeat) cycleColor();
+  });
+  document.addEventListener('keyup', e => { keys[e.key] = false; });
+
+  // Touch/mouse: drag steers, a tap without movement switches color.
+  let pointerX = null, moved = false;
+  const toCanvasX = clientX => (clientX - canvas.getBoundingClientRect().left) * (W / canvas.clientWidth);
+  canvas.addEventListener('pointerdown', e => { pointerX = toCanvasX(e.clientX); moved = false; canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener('pointermove', e => {
+    if (pointerX === null || !running) return;
+    const x = toCanvasX(e.clientX), d = x - pointerX;
+    if (Math.abs(d) > 2) moved = true;
+    plane.x = Math.max(PLANE_W / 2, Math.min(W - PLANE_W / 2, plane.x + d));
+    plane.tilt = Math.max(-0.4, Math.min(0.4, d * 0.05));
+    pointerX = x;
+  });
+  canvas.addEventListener('pointerup', () => { if (!moved) cycleColor(); pointerX = null; });
+
+  $('startBtn').addEventListener('click', start);
+
+  // First frame: a still scene behind the start card.
+  reset(); drawSky(); gates.push({ x: 120, y: 200, color: 1, speed: 0 }, { x: 280, y: 330, color: 0, speed: 0 });
+  gates.forEach(drawGate); drawPlane(); gates = [];
+})();
+</script>
+</html>
