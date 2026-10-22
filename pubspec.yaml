@@ -1,0 +1,24 @@
+name: quiet_vault
+description: A small Google-only vault synced with the Quiet Vault Chrome extension.
+publish_to: none
+version: 0.1.0+1
+environment:
+  sdk: '>=3.10.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  supabase_flutter: 2.18.3
+  cryptography: 2.9.0
+  cryptography_flutter: 2.3.4
+  flutter_secure_storage: 11.2.0
+  url_launcher: 6.3.3
+  uuid: 4.5.3
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: 6.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/mascot.png
+    - assets/demo.json

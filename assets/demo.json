@@ -1,0 +1,52 @@
+{
+  "owner": "11111111-1111-4111-8111-111111111111",
+  "secret": "JSUlJSUlJSUlJSUlJSUlJSUlJSUlJSUlJSUlJSUlJSU=",
+  "row": {
+    "user_id": "11111111-1111-4111-8111-111111111111",
+    "format": 1,
+    "salt": "53lNTvGyBV87BDsUPIm7Tg==",
+    "iterations": 600000,
+    "wrapped_key": "bq0ibB4hz3KglPNpGE2OQ2GAXmFpeH/SaxEq19k3CFvmp69UhuWqgBWtlDxi0O0Z",
+    "wrap_nonce": "A6Vx5hL4yJLcrRHw",
+    "ciphertext": "qBgeTIpa5/P4l3pyPk6+Nh/LVhbHFSR05ldVBtIfBFwXUCdIHFJ3GWP5QWiC/arwhXtCAbBVeHzrWO+3+vtQF1n3gvkFWROrYkHKWwAI6Awik54lf66ZHC17Gxl1Gfzg05j28yvndi+tfvEtjjJYV2451MKFoOwku+2FptHzlZkWTQgZTXgOaDzXlP9JDsBdl/A6ty7kG/cKEaLnonxkhF+MV7VraP4eB/JxLl2yjaSBNCGfZVI+4wwEEkXZoXEwIuSW5pWviLxxjNM1gu5ZusY0vhqcHU0o0la9hU5vHhg+aQ1KqiJI8YcKwNjWCn5MphkeSuz+QT7lsv5EsVR+CLkKsyoAHtLyKUjHFDR8jXsMD6DkXIGhkBCevGO8RRVc/Nr063li/+6fwx0Ga3NH7oB8Bx2+NtAJ2+AEweBzmExuHPkTdnYfDbx/AOPJIdJwa8lHJqF4dYVX3dp/vBtqgG9RsrkvN+QbFaJ8yUzq57w95eEGnLFfOlYy4RFmgbcfUUypn207uHlKlLtJ/roxtRd7q+x9OP1JQOow5UugTShiWrO5y15LVxYVde68vhrSzRyRf18/xZwzPBgcD9bdGtMObx58butFNIZqIfTC1vjvvNZkoPDA8KG3SDkrzGDJHT0AvV0MePF0BzNqvEUEUHXlqZd7+/3L2pHTmovFNc3brA44wvKhztKsYbkAtxhshjfgeW0CfiLtMAXJE5QAmTMObUr0rg9YZXrzMquhJK9ywZim40qcmjLdigdBCs9EMbWGLOL0KUNENi+oLGja0RUxbqWix5mtGwGbtCciRfjkoCAypvDci0ReQ6kpzgNILcu7/FV/AaCHr6DfX8QpPu3lUY7ciDKixtti7a9wL0Wg/fPkXqH9Dzx+9ghS8RzsHhzeniIq1+R+ASJ+ehz9HrqlG5Y+W+TAuygV7ywdvlprh72P9ZxNzekb3on2qwYr5+4+WVXWnKouGiGYyKBB46sWdr1o0c45+opak06Z8SranJCFY4YrEFd2azbuJ84mH8UO/gftavbgx9xvVzryvTAcSP2BJak15ims6JviiqirdiA1UsOnQNrN1pLaC76K8Plpae2ymfFmxsYbzcOyOzcIdEvB3vPOQeDYsUqDHL+i7gQ6og==",
+    "nonce": "ksXc2lwrFFtRf6CZ",
+    "revision": 1,
+    "unlock_mode": "managed"
+  },
+  "cache": {
+    "ciphertext": "WiPRUGHzK1FADR370F+8nbQTr3vz1Q4CRe3OTH07XwXrqZJV/Y+7Yc4IEq/ygwivLoZIt1zzXFzD9Ok2datQG4uxYnkWt1ZC6AvGM4BbzC/CTTJugx5DpTigbQU9EgRCW8Sv5pEbVNaXsouBZa8waC7Qwo1X7LjJDGGs5N1I7i60y1jDvjoGDzTfhifLF3XJwYwVQ3qDvQPa29NfPvKh1cuaB75aXenCECrzj9/6m+8NxbQBpJz+j1pR1AFQayNaZC0bq4fn/8wH8sVsWg65djPfKoTBiU5Ra5/STPHoA8iSgzlRzOvh7ku0g0SiijJWZZhTQ5kQi9SyZ2cIXiX38Ey/SGcFSlMHupum1w7Iq4L7pFczInylSNUe9rpiVXaG7Hvz28oj8SR5t52ktaO9YRZZOkkKnuN0EVCWZJfzXHWuOIEAebaah6Q95OMqXXTRs+63ISBLkTS9O/cDV6ZCBJWoZyf1RsC3rXRukjomFiBHL+FYXV90HrPEeapmwyeR7W3a7XfTg9/V3mJnDGt2wGD548u3VB30msCDZhLzEcWtzSeVd3WrF6g6FGRCWB44MGxb7Afrost1dh0rHBLeU4h66aza1NgwOnXX5hTo4aPiGlNNQTGUARFNl5gyeHHLqvxGEkkMlpkOo7YMZ7B21t4/unsmew1R9XBL+vJ4V1IpzgbmWZApWXtM9asll9keQcRK54z7D83Rf8R5S28Ed9h/a+EinQOjQ8WYG4tymCEPe8pMhcYCUaE4AKpVhYeGb33UXnt6kOtZzy4plsbFkz1BjoADYn0pLQEyhs8orFFzijN/cMl5CGJHAQA1vjtmu9coOrzaNcBsBEbM7cOu1mUCyT3K5x5mt0heUlBz1OwhZhNnWNe4SGhKn7NfNUi80usPbFesnna8m76vCwi7MSOaDuKD0BUmt+AOtqGHV5BR7WuAiPlxnOX9xE0HYnny/ev1etYbMpFG644VsjPbgT3vKQOp/drRttfT2Lm/hiwkayAtibYTiykTx7jiHKjDtxhYbPXVunupoi5q/5g1qH8lJDZHI00ElRgh1PJJwjItJGWTlozrt4z0lkmRwbrl4GNgt7BsFQm+ehCEMQrzWYdzeJffEsT5NO58AKR198uB9ZPGShnotlGwSm8v6bfP0fw=",
+    "nonce": "zykVdyEwk+6YUMiJ"
+  },
+  "entries": [
+    {
+      "name": "OpenAI · personal",
+      "value": "DEMO_ONLY_not_a_real_api_key",
+      "description": "https://platform.openai.com/api-keys",
+      "kind": "API key",
+      "id": "0adb6d06-f9d6-4b26-8049-ce96f10a003d",
+      "version": "9db5980f-1404-4258-a548-fb634e83269d",
+      "deleted": false,
+      "updatedAt": "2026-10-22T08:40:14.289Z"
+    },
+    {
+      "name": "GitHub token",
+      "value": "DEMO_ONLY_not_a_real_token",
+      "description": "For my side projects",
+      "kind": "Secret",
+      "id": "bbde6692-0245-417c-8984-fea85411f811",
+      "version": "d2f52d70-af3b-4485-b77d-72d44a6e5b2e",
+      "deleted": false,
+      "updatedAt": "2026-10-22T08:40:14.297Z"
+    },
+    {
+      "name": "DATABASE_URL",
+      "value": "postgres://demo:fake@example.invalid/demo",
+      "description": "Development only",
+      "kind": "Variable",
+      "id": "131ab8ce-3fcf-46b7-a0b4-e0abf43789d3",
+      "version": "8ab4ee16-5de7-4613-ab8e-09f067aab0fd",
+      "deleted": false,
+      "updatedAt": "2026-10-22T08:40:14.297Z"
+    }
+  ]
+}
