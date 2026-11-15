@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block Colors</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            touch-action: none;
+        }
+        #gameContainer {
+            text-align: center;
+        }
+        canvas {
+            border: 4px solid #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: block;
+            margin: 0 auto;
+            background: #1a1a2e;
+        }
+        #ui {
+            color: white;
+            margin-top: 20px;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            display: none;
+            text-align: center;
+        }
+        #gameOver h2 {
+            margin-bottom: 20px;
+            font-size: 36px;
+        }
+        #gameOver button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #gameOver button:hover {
+            background: #764ba2;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+        <div id="ui">
+            <div>Score: <span id="score">0</span></div>
+            <div>Lives: <span id="lives">3</span></div>
+            <div style="margin-top: 10px; font-size: 14px;">Arrow Keys / Touch to Move</div>
+        </div>
+        <div id="gameOver">
+            <h2>Game Over!</h2>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <button onclick="restartGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const COLORS = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94'];
+        const BLOCK_SIZE = 40;
+        const PLAYER_SIZE = 50;
+        const FALL_SPEED = 2;
+        
+        let player = {
+            x: canvas.width / 2 - PLAYER_SIZE / 2,
+            y: canvas.height - PLAYER_SIZE - 10,
+            size: PLAYER_SIZE,
+            color: COLORS[0],
+            speed: 6
+        };
+        
+        let blocks = [];
+        let score = 0;
+        let lives = 3;
+        let gameRunning = true;
+        let keys = {};
+        let touchStartX = null;
+        
+        function randomColor() {
+            return COLORS[Math.floor(Math.random() * COLORS.length)];
+        }
+        
+        function createBlock() {
+            return {
+                x: Math.random() * (canvas.width - BLOCK_SIZE),
+                y: -BLOCK_SIZE,
+                size: BLOCK_SIZE,
+                color: randomColor(),
+                speed: FALL_SPEED + Math.random() * 1
+            };
+        }
+        
+        function drawPlayer() {
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.size, player.size);
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(player.x, player.y, player.size, player.size);
+        }
+        
+        function drawBlock(block) {
+            ctx.fillStyle = block.color;
+            ctx.fillRect(block.x, block.y, block.size, block.size);
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(block.x, block.y, block.size, block.size);
+        }
+        
+        function checkCollision(block) {
+            return player.x < block.x + block.size &&
+                   player.x + player.size > block.x &&
+                   player.y < block.y + block.size &&
+                   player.y + player.size > block.y;
+        }
+        
+        function updateGame() {
+            if (!gameRunning) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Move player
+            if (keys['ArrowLeft'] && player.x > 0) {
+                player.x -= player.speed;
+            }
+            if (keys['ArrowRight'] && player.x < canvas.width - player.size) {
+                player.x += player.speed;
+            }
+            
+            // Spawn blocks
+            if (Math.random() < 0.02) {
+                blocks.push(createBlock());
+            }
+            
+            // Update and draw blocks
+            for (let i = blocks.length - 1; i >= 0; i--) {
+                const block = blocks[i];
+                block.y += block.speed;
+                
+                drawBlock(block);
+                
+                // Check collision
+                if (checkCollision(block)) {
+                    if (block.color === player.color) {
+                        score += 10;
+                        document.getElementById('score').textContent = score;
+                        blocks.splice(i, 1);
+                    } else {
+                        lives--;
+                        document.getElementById('lives').textContent = lives;
+                        blocks.splice(i, 1);
+                        if (lives <= 0) {
+                            endGame();
+                        }
+                    }
+                }
+                // Remove off-screen blocks
+                else if (block.y > canvas.height) {
+                    blocks.splice(i, 1);
+                }
+            }
+            
+            drawPlayer();
+            
+            if (gameRunning) {
+                requestAnimationFrame(updateGame);
+            }
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        function restartGame() {
+            player.x = canvas.width / 2 - PLAYER_SIZE / 2;
+            player.color = COLORS[0];
+            blocks = [];
+            score = 0;
+            lives = 3;
+            gameRunning = true;
+            document.getElementById('score').textContent = score;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('gameOver').style.display = 'none';
+            updateGame();
+        }
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            if (e.key === ' ' && gameRunning) {
+                const currentIndex = COLORS.indexOf(player.color);
+                player.color = COLORS[(currentIndex + 1) % COLORS.length];
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+        
+        // Touch controls
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            touchStartX = e.touches[0].clientX;
+            // Tap to change color
+            if (gameRunning) {
+                const currentIndex = COLORS.indexOf(player.color);
+                player.color = COLORS[(currentIndex + 1) % COLORS.length];
+            }
+        });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (touchStartX !== null) {
+                const touchX = e.touches[0].clientX;
+                const deltaX = touchX - touchStartX;
+                player.x += deltaX * 0.5;
+                player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
+                touchStartX = touchX;
+            }
+        });
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            touchStartX = null;
+        });
+        
+        // Start game
+        updateGame();
+    </script>
+</body>
+</html>
